@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101016">
+<title>Spomigration — Move your music data</title>
+<style>
+:root{color-scheme:dark;--bg:#0b0b10;--panel:#14141d;--line:#292936;--text:#f4f3f8;--muted:#a3a1b2;--accent:#a9bdd1;--good:#8fd6b0;--warn:#f0c987}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% 0%,#202737 0,transparent 42%),var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:1050px;margin:auto;padding:34px 20px 70px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px}.brand{font-weight:800;letter-spacing:.14em;font-size:13px;color:var(--accent)}.tag{font-size:12px;color:var(--muted);border:1px solid var(--line);padding:6px 10px;border-radius:99px}h1{font-size:clamp(34px,7vw,62px);line-height:1.02;letter-spacing:-.05em;margin:48px 0 14px;max-width:720px}h1 span{color:var(--accent)}.intro{color:var(--muted);max-width:650px;font-size:16px}.panel{background:linear-gradient(145deg,#171722,#111119);border:1px solid var(--line);border-radius:18px;padding:22px;margin-top:28px;box-shadow:0 18px 60px #0004}.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.drop{border:1px dashed #55566a;border-radius:14px;padding:30px 18px;text-align:center;flex:1;min-width:230px;background:#0d0d14}.drop.drag{border-color:var(--accent);background:#18202b}.drop strong{display:block;font-size:18px;margin-bottom:5px}.muted{color:var(--muted)}button,.button{border:0;border-radius:10px;padding:11px 15px;background:var(--accent);color:#111820;font-weight:750;cursor:pointer;font:inherit}button:disabled{opacity:.4;cursor:not-allowed}.secondary{background:#252532;color:var(--text);border:1px solid var(--line)}input[type=file]{display:none}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}.stat{background:#0d0d14;border:1px solid var(--line);padding:15px;border-radius:12px}.stat b{display:block;font-size:25px}.stat small{color:var(--muted)}.tools{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}.tools input{flex:1;min-width:180px;background:#0d0d14;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:11px}.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:12px}table{border-collapse:collapse;width:100%;min-width:650px}th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line)}th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}td{max-width:320px;overflow-wrap:anywhere}tr:last-child td{border:0}.pill{font-size:11px;border:1px solid #3a3a49;color:var(--muted);padding:3px 7px;border-radius:99px}.notice{border-left:3px solid var(--warn);padding:10px 13px;background:#211c14;color:#d9c8a8;border-radius:0 9px 9px 0;margin-top:16px;font-size:13px}.empty{padding:30px;text-align:center;color:var(--muted)}footer{margin-top:30px;color:var(--muted);font-size:12px}a{color:var(--accent)}@media(max-width:600px){main{padding:22px 14px 50px}.panel{padding:16px}.stats{grid-template-columns:1fr 1fr}.stat:last-child{grid-column:span 2}h1{margin-top:38px}}
+</style>
+</head>
+<body><main>
+<div class="top"><div class="brand">SPOMIGRATION</div><div class="tag">LOCAL FIRST · NO ACCOUNT</div></div>
+<h1>Your playlists.<br><span>Your next destination.</span></h1>
+<p class="intro">Turn a playlist export into a clean, portable music library. Import a CSV or JSON file, review the tracks, remove duplicates, then export your data.</p>
+<section class="panel">
+<div class="row">
+<div class="drop" id="drop"><strong>Drop your playlist export here</strong><div class="muted">CSV, TSV or JSON · processed on this device</div><div style="margin-top:15px"><label class="button" for="file">Choose file</label><input id="file" type="file" accept=".csv,.tsv,.json,text/csv,application/json"></div></div>
+<div style="flex:1;min-width:210px"><b>What can I import?</b><p class="muted">CSV exports from playlist tools, spreadsheet exports, and JSON track lists with common fields such as track name, artist, album and Spotify URI.</p><p class="muted" style="font-size:12px">No Spotify password or API key is requested.</p></div>
+</div>
+<div id="message" class="muted" role="status" style="margin-top:14px">Waiting for a file.</div>
+<div class="stats"><div class="stat"><b id="total">0</b><small>Tracks loaded</small></div><div class="stat"><b id="artists">0</b><small>Unique artists</small></div><div class="stat"><b id="dupes">0</b><small>Duplicate rows</small></div></div>
+<div class="tools"><input id="filter" type="search" placeholder="Search tracks, artists or albums…" aria-label="Search tracks"><button id="dedupe" class="secondary" disabled>Remove duplicates</button><button id="csv" disabled>Export CSV</button><button id="json" class="secondary" disabled>Export JSON</button></div>
+<div class="tablewrap"><table><thead><tr><th>Track</th><th>Artist</th><th>Album</th><th>Duration</th><th>Source ID</th></tr></thead><tbody id="body"><tr><td colspan="5" class="empty">Your tracks will appear here.</td></tr></tbody></table></div>
+<div class="notice"><b>Playback note:</b> This tool moves playlist metadata, not audio. Spotify does not provide third-party apps with downloadable or directly playable Spotify audio. A destination service must support its own authorized import or matching flow.</div>
+</section>
+<footer>Spomigration is an independent community project and is not affiliated with Spotify or BitChord. Files are read in your browser and are not uploaded by this page.</footer>
+</main>
+<script>
+(()=> {
+const $=id=>document.getElementById(id);let tracks=[];
+const norm=s=>String(s??'').trim();
+const key=s=>norm(s).toLowerCase().replace(/[^a-z0-9]+/g,'');
+const aliases={
+title:['trackname','track','title','name','song','songname'],
+artist:['artistname','artistnames','artist','artists','performer'],
+album:['albumname','album','release'],
+duration:['durationms','duration','length','lengthms'],
+id:['trackuri','spotifyuri','uri','trackid','id'],
+url:['trackurl','spotifyurl','url','externalurl']
+};
+function pick(obj,list){const entries=Object.entries(obj);for(const a of list){const found=entries.find(([k])=>key(k)===a);if(found)return found[1]}return ''}
+function normalize(obj){const t={title:norm(pick(obj,aliases.title)),artist:norm(pick(obj,aliases.artist)),album:norm(pick(obj,aliases.album)),duration:norm(pick(obj,aliases.duration)),id:norm(pick(obj,aliases.id)),url:norm(pick(obj,aliases.url))};if(!t.title)return null;if(!t.id&&t.url){const m=t.url.match(/track[/:]([A-Za-z0-9]+)/);if(m)t.id=m[1]}return t}
+function parseCSV(text,delimiter){const rows=[];let row=[],cell='',quoted=false;for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];if(c==='"'){if(quoted&&n==='"'){cell+='"';i++}else quoted=!quoted}else if(c===delimiter&&!quoted){row.push(cell);cell=''}else if((c==='\n'||c==='\r')&&!quoted){if(c==='\r'&&n==='\n')i++;row.push(cell);if(row.some(v=>v.trim()))rows.push(row);row=[];cell=''}else cell+=c}row.push(cell);if(row.some(v=>v.trim()))rows.push(row);if(rows.length<2)throw Error('The CSV needs a header row and at least one track.');const headers=rows.shift().map(norm);return rows.map(r=>Object.fromEntries(headers.map((h,i)=>[h,r[i]??''])))}
+function fromJSON(data){if(Array.isArray(data))return data;if(data&&Array.isArray(data.tracks))return data.tracks;if(data&&data.items&&Array.isArray(data.items))return data.items.map(x=>x.track||x);throw Error('JSON must be an array of tracks or contain a tracks/items array.')}
+function duration(v){if(!v)return '';let n=Number(v);if(!Number.isFinite(n))return v;if(n>10000)n=Math.round(n/1000);return Math.floor(n/60)+':'+String(n%60).padStart(2,'0')}
+function escapeCSV(v){const s=String(v??'');return /[",\r\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}
+function download(name,data,type){const blob=new Blob([data],{type}),a=document.createElement('a'),u=URL.createObjectURL(blob);a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)}
+function stats(){const artists=new Set(tracks.map(t=>t.artist.toLowerCase()).filter(Boolean));const counts=new Map();tracks.forEach(t=>{const k=(t.title+'|'+t.artist).toLowerCase();counts.set(k,(counts.get(k)||0)+1)});$('total').textContent=tracks.length;$('artists').textContent=artists.size;$('dupes').textContent=[...counts.values()].reduce((n,c)=>n+Math.max(0,c-1),0);['dedupe','csv','json'].forEach(id=>$(id).disabled=!tracks.length);render()}
+function render(){const q=$('filter').value.toLowerCase();const shown=tracks.filter(t=>[t.title,t.artist,t.album,t.id].join(' ').toLowerCase().includes(q));$('body').innerHTML='';if(!shown.length){$('body').innerHTML='<tr><td colspan="5" class="empty">No matching tracks.</td></tr>';return}shown.slice(0,500).forEach(t=>{const tr=document.createElement('tr');[t.title,t.artist,t.album,duration(t.duration),t.id||'—'].forEach((v,i)=>{const td=document.createElement('td');td.textContent=v||'—';if(i===4)td.className='muted';tr.appendChild(td)});$('body').appendChild(tr)});if(shown.length>500){const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=5;td.className='empty';td.textContent='Showing first 500 matches. Export includes all tracks.';tr.appendChild(td);$('body').appendChild(tr)}}
+async function load(file){try{const text=await file.text();let raw;if(file.name.toLowerCase().endsWith('.json'))raw=fromJSON(JSON.parse(text));else{const delimiter=file.name.toLowerCase().endsWith('.tsv')?'\t':(text.split('\n')[0].includes('\t')?'\t':',');raw=parseCSV(text,delimiter)}const parsed=raw.map(normalize).filter(Boolean);if(!parsed.length)throw Error('No recognizable track rows found. Check that the file has track and artist columns.');tracks=parsed;stats();$('message').textContent='Loaded '+tracks.length+' tracks from '+file.name+'.';}catch(e){$('message').textContent='Could not import file: '+e.message}}
+$('file').addEventListener('change',e=>{if(e.target.files[0])load(e.target.files[0]);e.target.value=''});$('filter').addEventListener('input',render);$('dedupe').addEventListener('click',()=>{const seen=new Set();tracks=tracks.filter(t=>{const k=(t.title+'|'+t.artist).toLowerCase();if(seen.has(k))return false;seen.add(k);return true});stats();$('message').textContent='Duplicates removed. '+tracks.length+' tracks remain.'});
+$('csv').addEventListener('click',()=>{const cols=['title','artist','album','duration','id','url'];download('spomigration-library.csv',[cols.join(','),...tracks.map(t=>cols.map(c=>escapeCSV(t[c])).join(','))].join('\r\n'),'text/csv;charset=utf-8')});
+$('json').addEventListener('click',()=>download('spomigration-library.json',JSON.stringify({format:'spomigration-library-v1',exportedAt:new Date().toISOString(),tracks},null,2),'application/json'));
+const drop=$('drop');['dragenter','dragover'].forEach(e=>drop.addEventListener(e,x=>{x.preventDefault();drop.classList.add('drag')}));['dragleave','drop'].forEach(e=>drop.addEventListener(e,x=>{x.preventDefault();drop.classList.remove('drag')}));drop.addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(f)load(f)});
+})();
+</script></body></html>
