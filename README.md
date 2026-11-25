@@ -1,26 +1,48 @@
 # Spomigration
 
-Spomigration explores moving Spotify playlist and artist metadata into a BitChord-friendly music workflow.
+A local-first playlist metadata migration workspace. The first web app is a static page that runs entirely in the browser.
+
+## Live preview
+
+After enabling GitHub Pages for the `main` branch with the `/(root)` folder, the app will be available at:
+
+`https://drmmyboty.github.io/Spomigration-/`
+
+## Current features
+
+- Import CSV, TSV, or JSON playlist exports.
+- Recognize common track, artist, album, duration, Spotify URI, and URL column names.
+- Search the imported library.
+- Detect and remove duplicate track-and-artist pairs.
+- Export a clean CSV or a portable Spomigration JSON file.
+- Process files locally in the browser. No upload, account, API key, or backend is required.
+
+## Enable the website
+
+1. Open this repository on GitHub.
+2. Go to **Settings → Pages**.
+3. Under **Build and deployment**, choose **Deploy from a branch**.
+4. Select branch **main** and folder **/(root)**, then save.
+5. Wait for GitHub Pages to publish the site.
 
 ## Important compatibility note
 
-BitChord custom addons expose a track catalogue through three HTTP routes:
+BitChord custom addons expose a track catalogue through routes such as `GET /manifest.json`, `GET /search?q=...`, and `GET /stream/{id}`. That protocol does not define playlist import or migration endpoints.
 
-- `GET /manifest.json`
-- `GET /search?q=...`
-- `GET /stream/{id}`
+Spotify's official API can provide catalogue metadata with the required authorization, but it does not provide third-party apps with playable Spotify audio streams. Spomigration therefore does not claim to download Spotify audio or stream Spotify tracks into BitChord.
 
-That protocol does not define playlist import, playlist export, or playlist migration endpoints. A BitChord addon also has to return a directly playable media URL from `/stream/{id}`.
+## Current limitations
 
-Spotify's official API can provide catalogue metadata with the required authorization, but it does not provide third-party apps with playable Spotify audio streams. Therefore, a Spotify-only addon cannot honestly promise playback in BitChord.
+- This version imports playlist files that the user already has. It does not sign in to Spotify or fetch a private Spotify playlist.
+- It exports metadata, not playable audio URLs.
+- Matching tracks to another service requires a separate integration with a provider whose API and terms permit it.
 
-## Planned direction
+## Privacy
 
-1. Use Spotify's authorized API for artist, album, and playlist metadata where access is permitted.
-2. Keep playlist transfer as a separate feature rather than pretending it is part of BitChord's addon protocol.
-3. Only resolve tracks through a playback provider whose API and terms permit this use.
-4. Implement and publish a BitChord addon only after its search and stream routes can return valid, tested responses.
+The static app reads selected files in the browser. It does not upload them to a Spomigration server. Do not import files containing information you do not want visible on your own device.
 
-## Status
+## Project status
 
-Repository setup only. No working addon URL is published yet.
+The first usable local prototype is in `index.html`. The Spotify-authorized import and destination-provider integrations are not implemented yet.
+
+Spomigration is an independent community project and is not affiliated with Spotify or BitChord.
